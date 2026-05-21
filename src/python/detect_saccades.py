@@ -172,12 +172,8 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
     print("Done!")
 
 if __name__ == "__main__":
-    import os
-    # Get the directory where the script is located
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    # Construct the path to the data file
-    data_file = os.path.join(script_dir, '..', '..', 'data', '80O.set')
-    out_file = os.path.join(script_dir, '..', '..', 'src', 'jupyter', 'add_saccade_events.m')
+
+    data_file = input("Enter the path to the data file: ")
+    out_file = input("Enter the output path: ")
     
-    # Increased threshold slightly to naturally exclude lower-velocity noise events
     detect_saccades(data_file, out_file, threshold_z=2.0)
