@@ -8,7 +8,7 @@ Ensure you have the required dependencies installed. You can install them using:
 ```bash
 pip install mne numpy scipy
 ```
-*(Or by using `pip install -r src/python/requirements.txt` if available)*
+*(Or by using `pip install -r src/python/phantom-array-experiment/requirements.txt` if available)*
 
 ## Usage
 The script is run from the command line and will prompt you for the input and output paths.
@@ -16,7 +16,7 @@ The script is run from the command line and will prompt you for the input and ou
 ### Running the Script
 Execute the script using Python:
 ```bash
-python src/python/detect_saccades.py
+python src/python/phantom-array-experiment/detect_saccades.py
 ```
 
 ### Inputs

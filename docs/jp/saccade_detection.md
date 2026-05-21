@@ -8,7 +8,7 @@
 ```bash
 pip install mne numpy scipy
 ```
-*(または `pip install -r src/python/requirements.txt` を使用)*
+*(または `pip install -r src/python/phantom-array-experiment/requirements.txt` を使用)*
 
 ## 使い方
 スクリプトはコマンドラインから実行し、入力パスと出力パスを対話形式で入力します。
@@ -16,7 +16,7 @@ pip install mne numpy scipy
 ### スクリプトの実行
 Pythonを使用してスクリプトを実行します。
 ```bash
-python src/python/detect_saccades.py
+python src/python/phantom-array-experiment/detect_saccades.py
 ```
 
 ### 入力項目
