@@ -67,8 +67,7 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
         if abs_velocity[peak] > outlier_threshold:
             continue
             
-        # Gate 6 (NEW): Minimum Step Amplitude Check (Microsaccade Rejection)
-        # Rejects tiny bumps that are not full tracking saccades
+        # Gate 6: Minimum Step Amplitude Check (Microsaccade Rejection)
         win_mean = int(0.15 * sfreq) # 150 ms window
         gap = int(0.02 * sfreq) # 20 ms gap from peak to avoid the transition
         
@@ -85,17 +84,14 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
             continue
         
         # Gate 5: EEG Overlap / Artifact Check
-        # Rejects saccades if reflection point overlaps with massive noise in other channels
         win_overlap_start = int(0.1 * sfreq)
         win_overlap_end = int(0.3 * sfreq)
         start_eeg = max(0, peak - win_overlap_start)
         end_eeg = min(eeg_data.shape[1], peak + win_overlap_end)
         
-        # Calculate Peak-to-Peak in EEG channels in this window
         ptp_per_chan = np.ptp(eeg_data[:, start_eeg:end_eeg], axis=1)
         max_eeg_ptp = np.max(ptp_per_chan) if len(ptp_per_chan) > 0 else 0
         
-        # If the artifact in ANY EEG channel exceeds 110 µV, reject it
         if max_eeg_ptp > 0.000110:
             continue
             
@@ -106,7 +102,6 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
         window_vel = abs_velocity[start_idx:end_idx]
         primary_height = abs_velocity[peak]
         
-        # Use prominence to avoid detecting tiny noisy ripples as "secondary peaks"
         local_peaks, _ = find_peaks(window_vel, prominence=0.4 * primary_height)
         secondary_too_high = False
         
@@ -132,11 +127,9 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
         end_idx_300 = min(len(velocity), peak + win_300ms)
         post_vel_window = velocity[peak:end_idx_300]
         
-        # Smooth velocity with 25-sample kernel (50 ms) to remove high-frequency noise
         kernel = np.ones(25) / 25.0
         smooth_vel = np.convolve(post_vel_window, kernel, mode='valid')
         
-        # Apply deadband: ignore velocity close to zero (e.g. 5% of peak velocity)
         deadband = 0.05 * primary_height
         smooth_vel[np.abs(smooth_vel) < deadband] = 0
         
@@ -149,7 +142,7 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
         if sign_changes > 4:
             continue
             
-        # If all gates pass, add to valid peaks
+        # Add to valid peaks if all gates pass
         valid_peaks.append(peak)
         
     print(f"After quality gates, {len(valid_peaks)} valid Saccades remain.")
