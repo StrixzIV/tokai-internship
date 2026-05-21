@@ -1,0 +1,7 @@
+mne==1.12.1
+mne-qt-browser
+pyqt6
+pyvistaqt
+vtk
+jupyter
+pandas
