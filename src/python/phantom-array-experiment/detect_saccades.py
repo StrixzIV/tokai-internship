@@ -2,6 +2,12 @@ import mne
 import numpy as np
 from scipy.signal import find_peaks
 
+# --- GLOBAL CONFIGURATION ---
+# Threshold for EEG Overlap / Artifact Check. Saccades coinciding with EEG 
+# peak-to-peak amplitudes above this value will be rejected as noise/artifacts.
+MAX_EEG_P2P_THRESHOLD = 0.000200
+
+
 def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance_ms=250):
     """
     Detects Saccades from an EOG channel using velocity thresholding and rigorous quality gates.
@@ -92,7 +98,7 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
         ptp_per_chan = np.ptp(eeg_data[:, start_eeg:end_eeg], axis=1)
         max_eeg_ptp = np.max(ptp_per_chan) if len(ptp_per_chan) > 0 else 0
         
-        if max_eeg_ptp > 0.000110:
+        if max_eeg_ptp > MAX_EEG_P2P_THRESHOLD:
             continue
             
         # Gate 1: Single-Peak Velocity Shape (±100 ms window)
@@ -153,8 +159,22 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
         f.write("% Saccade events auto-generated from Python script\n")
         f.write("% Copy and run these commands in MATLAB after loading your EEG dataset (EEG variable)\n\n")
         
+        f.write("% Remove any existing 'Saccade' events to avoid duplicates if run multiple times\n")
+        f.write("if isfield(EEG.event, 'type')\n")
+        f.write("    saccade_idx = strcmp({EEG.event.type}, 'Saccade');\n")
+        f.write("    EEG.event(saccade_idx) = [];\n")
+        f.write("end\n\n")
+        
         for p in valid_peaks:
-            time = p / sfreq
+            # Find saccade onset: trace backward from peak velocity until it drops below 5% of peak
+            peak_vel = abs_velocity[p]
+            p_onset = p
+            max_lookback = int(0.1 * sfreq) # max 100ms lookback
+            
+            while p_onset > max(0, p - max_lookback) and abs_velocity[p_onset] > 0.05 * peak_vel:
+                p_onset -= 1
+                
+            time = p_onset / sfreq
             f.write(f"EEG.event(end+1).type = 'Saccade'; EEG.event(end).latency = {time:.4f} * EEG.srate;\n")
             
         f.write("\n% Check for consistency and re-sort events by latency\n")
