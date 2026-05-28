@@ -46,7 +46,7 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=2.0, min_distance
     
     # Isolate EOG
     eog_ch = raw.copy().pick_channels(['EOG'])
-    eog_ch.filter(l_freq=0.5, h_freq=30.0, fir_design='firwin')
+    eog_ch.filter(l_freq=None, h_freq=30.0, fir_design='firwin')
     eog_data = eog_ch.get_data()[0]
     
     # Isolate EEG channels for overlap/artifact checking

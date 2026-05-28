@@ -8,7 +8,7 @@ The `detect_saccades.py` script automatically detects saccadic eye movements fro
 ```mermaid
 graph TD
     A([Start]) --> B["Load EEGLAB Dataset (.set/.fdt)"]
-    B --> C1["Isolate & Filter EOG Channel (0.5 - 30 Hz)"]
+    B --> C1["Isolate & Filter EOG Channel (Low-pass 30 Hz)"]
     B --> C2["Isolate & Filter EEG Channels (0.5 - 30 Hz)"]
     C1 --> D["Compute EOG Velocity (First Derivative)"]
     D --> E["Compute Velocity Threshold (Mean + Z * STD)"]
