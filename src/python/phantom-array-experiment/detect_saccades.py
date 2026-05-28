@@ -8,10 +8,33 @@ from scipy.signal import find_peaks
 MAX_EEG_P2P_THRESHOLD = 0.000200
 
 
-def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance_ms=250):
+def detect_saccades(data_path, output_matlab_path, threshold_z=2.0, min_distance_ms=250):
+
     """
-    Detects Saccades from an EOG channel using velocity thresholding and rigorous quality gates.
+        Detects Saccades from an EOG channel using velocity thresholding and rigorous quality gates.
+
+        Parameters
+        ----------
+        data_path : str
+            Path to the EEGLAB dataset (.set/.fdt).
+        output_matlab_path : str
+            Path where the generated MATLAB helper script (.m) will be saved.
+        threshold_z : float, default 2.0
+            Z-score multiplier for the absolute velocity threshold.
+        min_distance_ms : float, default 250
+            Minimum temporal distance between adjacent saccades in milliseconds to prevent
+            double-detecting the same saccade.
+
+        Quality Gates Applied (in sequence of execution):
+        ---------------------
+        - Gate 1 (Velocity Outlier Check): Reject peaks with absolute velocity exceeding Median + 3 * IQR.
+        - Gate 2 (Minimum Step Amplitude Check): Reject microsaccades/noise where EOG step amplitude < 130 µV.
+        - Gate 3 (EEG Overlap/Artifact Check): Reject saccades that coincide with high-amplitude EEG activity (> 200 µV).
+        - Gate 4 (Single-Peak Velocity Shape): Ensure a clean, single-peak velocity within a ±100 ms window.
+        - Gate 5 (Post-Saccade Fixation Stability): Ensure EOG standard deviation in a 200 ms post-saccade window is < 1.5 * global EOG std.
+        - Gate 6 (Waveform Monotonicity): Ensure the post-saccade velocity is smooth and has <= 4 sign reversals (direction changes) within a 300 ms window.
     """
+
     print(f"Loading data from {data_path}...")
     raw = mne.io.read_raw_eeglab(data_path, preload=True)
     
@@ -69,11 +92,11 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
         
     for peak in candidate_peaks:
 
-        # Gate 4: Velocity Outlier Check (Global)
+        # Gate 1: Velocity Outlier Check (Global)
         if abs_velocity[peak] > outlier_threshold:
             continue
             
-        # Gate 6: Minimum Step Amplitude Check (Microsaccade Rejection)
+        # Gate 2: Minimum Step Amplitude Check (Microsaccade Rejection)
         win_mean = int(0.15 * sfreq) # 150 ms window
         gap = int(0.02 * sfreq) # 20 ms gap from peak to avoid the transition
         
@@ -89,7 +112,7 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
         if step_amp < 0.000130: # 130 µV
             continue
         
-        # Gate 5: EEG Overlap / Artifact Check
+        # Gate 3: EEG Overlap / Artifact Check
         win_overlap_start = int(0.1 * sfreq)
         win_overlap_end = int(0.3 * sfreq)
         start_eeg = max(0, peak - win_overlap_start)
@@ -101,7 +124,7 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
         if max_eeg_ptp > MAX_EEG_P2P_THRESHOLD:
             continue
             
-        # Gate 1: Single-Peak Velocity Shape (±100 ms window)
+        # Gate 4: Single-Peak Velocity Shape (±100 ms window)
         win_100ms = int(0.1 * sfreq)
         start_idx = max(0, peak - win_100ms)
         end_idx = min(len(abs_velocity), peak + win_100ms)
@@ -120,7 +143,7 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
         if secondary_too_high:
             continue
             
-        # Gate 2: Post-Saccade Fixation Stability (200 ms post-peak window)
+        # Gate 5: Post-Saccade Fixation Stability (200 ms post-peak window)
         win_200ms = int(0.2 * sfreq)
         end_idx_200 = min(len(eog_data), peak + win_200ms)
         post_eog_window = eog_data[peak:end_idx_200]
@@ -128,7 +151,7 @@ def detect_saccades(data_path, output_matlab_path, threshold_z=1.5, min_distance
         if np.std(post_eog_window) >= 1.5 * global_eog_std:
             continue
             
-        # Gate 3: Waveform Monotonicity of the Ramp (300 ms post-peak window)
+        # Gate 6: Waveform Monotonicity of the Ramp (300 ms post-peak window)
         win_300ms = int(0.3 * sfreq)
         end_idx_300 = min(len(velocity), peak + win_300ms)
         post_vel_window = velocity[peak:end_idx_300]
