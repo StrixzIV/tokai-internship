@@ -3,5 +3,9 @@ data
 .vscode
 *__pycache__
 
+out/*.m
+out/*.set
+out/*.fdt
+
 .env
 add_saccade_events.m
