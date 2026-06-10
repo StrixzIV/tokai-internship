@@ -1,75 +1,98 @@
-# Weekly Progress Report (Week 4 Plan & Setup)
+# Weekly Progress Report (Week 4 Status Update)
 **Project Title**: Automating Ocular Tracking in Phantom Array Psychophysics & Pupillometry Bistability Analysis
 **Joint Research Collaboration**: Tokai Data Science and Brain Lab (Tokai University) & King Mongkut's Institute of Technology Ladkrabang (KMITL)
-**Date**: June 13, 2026 (Projected / Planned)
+**Date**: June 10, 2026 (Wednesday Update)
 **Prepared by**: Jirayu Kaewsing & Research Assistant Team
 
 ---
 
 ## 1. Executive Summary
-This report outlines the planned experimental design, physiological rationales, and EyeLink 1000 Plus calibration protocols established for execution during Week 4 (June 8 – June 13, 2026) of the collaborative internship. Following the successful completion of the primary neurophysiological goals of the Phantom Array Effect (PAE) study in Week 3, the project is transitioning to the **Blue Duty Cycle Pupil Study**.
+This report outlines the experimental design, physiological rationales, active development achievements, and a critical redirection of physical lab recordings during Week 4 (June 8 – June 13, 2026) of the collaborative internship. While the initial technical focus of Week 4 has been the structural preparation and pipeline optimization for the upcoming **Blue Duty Cycle Pupil Study**, physical pupil recordings scheduled for today were postponed to tomorrow (Thursday, June 11, 2026) due to lab hardware allocation adjustments. 
 
-The primary focus of Week 4 is to investigate the light-response and temporal integration characteristics of intrinsically photosensitive retinal ganglion cells (ipRGCs) under blue flickering light using the Pupillary Light Reflex (PLR) as a physiological marker. To prepare for this phase, we have translated and compiled a comprehensive English translation of the Japanese experimental protocol under `docs/en/blue_duty_cycle_pupil_protocol.md` and established strict mathematical and physical criteria to ensure high-fidelity, continuous ocular data collection.
+In response, today's active lab session (Wednesday, June 10, 2026) was successfully dedicated to recording high-density visual EEG data from subject `Takahira` for the **Phantom Array Experiment (PAE) Slower Frequency Protocol**. By focusing on slower temporal light modulations (**0 Hz, 80 Hz, 160 Hz, 300 Hz, 500 Hz, and 1000 Hz**), this session specifically targeted the visual threshold frequencies where there is a high probability of encountering the conscious Phantom Array Effect (PAE). These trials were executed under two background chromatic conditions (**with and without a green LED** background) and included an advanced **Lambda variant** visual stimulation mode.
+
+Concurrently, the computational foundations for the Pupil Study were completed. This includes translating and standardizing the Japanese experimental protocol into English (`docs/en/blue_duty_cycle_pupil_protocol.md`), replacing legacy Excel/VBA scripts with a robust automated Python/pandas preprocessing pipeline, and implementing a sliding-window blink mask combined with Piecewise Cubic Hermite Interpolating Polynomial (`pchip`) interpolation to ensure continuous, low-noise ocular data collection once physical pupil recording commences tomorrow.
 
 ---
 
-## 2. Experimental Design & Rationale (Week 4 Objectives)
+## 2. Progress Details
 
-### 2.1. Visual Stimulation Parameters
-*   **Stimulus Properties:** Blue flickering light modulated at a frequency of **1 Hz** with a luminance of **50 cd/m²** (irradiance values to be logged during subsequent physical measurements).
-*   **Duty Cycle Conditions:** The stimulation will be tested at three distinct duty cycles: **25%, 50%, and 75%** (delivered in 25% equal steps).
+### Week 4 (June 8 – June 13, 2026): Phantom Array Slower Frequency Recordings & Pupil Study Script Optimization
+
+*   **Wednesday, June 10, 2026 (Lab Day 1)**:
+    *   **High-Density EEG Recording (Slower Frequency PAE)**: Successfully recorded high-density visual EEG data from subject Takahira using the TOKAI Orb headband system (1000 Hz sampling rate, Queen's Square occipital montage: PO7, O1, Oz, O2, PO8). The session completed testing across a comprehensive array of slower stimulus frequencies: **0 Hz (control), 80 Hz, 160 Hz, 300 Hz, 500 Hz, and 1000 Hz**. These slower frequencies lie close to visual saccadic thresholds, offering a high likelihood of triggering the conscious Phantom Array Effect. Each frequency was tested across two background illumination profiles: **with and without green LED** background. In addition, we successfully recorded trials using the **Lambda variant** visual stimulation.
+
+---
+
+## 3. Experimental Design & Rationale (Week 4 Protocols)
+
+### 3.1. Phantom Array Slower Frequency Protocol (Executed June 10, 2026)
+This protocol investigates the visual thresholds and electrophysiological signatures of the Phantom Array Effect under slower, highly perceptible temporal light modulations.
+
+*   **Slower Frequency Selection (0, 80, 160, 300, 500, 1000 Hz):**
+    *   *Saccadic Visual Thresholds:* Traditional high-frequency flicker (e.g., above 1000 Hz) is completely fused by the human visual system under steady fixation. However, during rapid eye movements (saccades), the spatial displacement of light on the retina can break this temporal fusion, giving rise to the Phantom Array Effect (PAE)—the perception of discrete, duplicated spatial patterns. Slower frequencies (especially 80 Hz and 160 Hz) are highly prone to triggering this effect because they sit closer to the eye's temporal integration limits. Recording up to 1000 Hz enables us to map the precise threshold curve where the visual cortex transitions from perisaccadic breakthrough back to complete visual suppression.
+*   **Green LED Background Conditions (With/Without):**
+    *   *Chromatic Retinal Modulation:* Recording with and without a steady green LED background allows us to study how ambient chromatic light interacts with the occipital cortical representation (specifically the 40–100 Hz high-gamma band in the Oz channel). Green background light is hypothesized to stabilize baseline photoreceptor activity and alter the contrast threshold of the visual pathways, potentially modulating the intensity and perisaccadic breakthrough of the phantom array perception.
+*   **Lambda Variant Visual Stimulation:**
+    *   *Saccadic-Linked Potentials:* The Lambda variant introduces specialized temporal frequency modulations linked to specific saccade profiles. This helps us isolate the visual "Lambda wave" (a positive post-saccadic potential generated in the visual cortex in response to the shift of a patterned image across the retina) and evaluate how temporal light modulation alters these automatic cortical potentials.
+
+### 3.2. Blue Duty Cycle Pupil Protocol (Postponed to June 11, 2026)
+This protocol investigates the light-response and temporal integration characteristics of intrinsically photosensitive retinal ganglion cells (ipRGCs) under blue flickering light using the Pupillary Light Reflex (PLR) as a physiological marker.
+
+*   **Visual Stimulation Parameters:** Blue flickering light modulated at a frequency of **1 Hz** with a luminance of **50 cd/m²** tested at three distinct duty cycles: **25%, 50%, and 75%** (delivered in 25% equal steps).
     *   *Temporal Summation Analysis:* This setup is designed to evaluate how the pupil's constriction rate and Post-Illumination Pupillary Response (PIPR) scale relative to the light energy exposure time. This allows us to statistically model the temporal summation dynamics of the ipRGC pathway and evaluate if the response behaves linearly or exhibits saturation (plateauing) between 50% and 75%.
-    *   *Data Quality Control:* The moderate 50 cd/m² intensity and slow 1 Hz flicker are optimized to prevent discomfort glare. Minimizing glare prevents participants from squinting or blinking, which is essential to secure continuous, high-fidelity pupillometry recordings.
-
-### 2.2. Environmental and Physical Setup
-*   **Twilight Adaptation (Mesopic Adaptation):** Standardized at exactly **15 minutes** prior to stimulation.
-    *   *Arousal vs. Dark Adaptation:* While 30 minutes of dark adaptation is standard, 15 minutes is selected to prevent participant drowsiness. Complete darkness induces a drop in alertness leading to sleepiness-induced miosis (pupil noise), whereas 15 minutes is the strict physiological minimum to stabilize baseline light adaptation without inducing sleepiness.
-*   **Ambient Room Brightness:** Regulated at a background illumination of **16.1 lux** inside the shielded recording room.
-    *   *Prevention of Baseline Drift:* A background of 16.1 lux keeps participants awake, stabilizing the baseline pupil size (Kardon et al., 2009).
-    *   *Blink Avoidance:* Exposing a fully dark-adapted eye to blue light causes intense discomfort glare and triggers missing data frames due to blinks. Background light slightly tempers retinal sensitivity, securing high-precision recordings (Kelbsch et al., 2019).
-    *   *Ecological Validity:* Standard smartphone and display usage in dim rooms matches this 16.1 lux ambient environment, making the findings highly applicable to real-world display engineering.
-*   **Physical Distance & Visual Angle:** Fixed viewing distance of exactly **57.3 cm** from the monitor screen to the participant's eyes.
-    *   *Mathematical Convenience:* At a distance of 57.3 cm, 1 cm on the screen equals exactly 1° of visual angle ($1\text{ cm} \approx 1^\circ$), simplifying visual angle calculations.
+*   **Environmental and Physical Setup:**
+    *   *Twilight Adaptation (Mesopic Adaptation):* Standardized at exactly **15 minutes** prior to stimulation to stabilize baseline light adaptation without inducing sleepiness-induced miosis.
+    *   *Ambient Room Brightness:* Regulated at a background illumination of **16.1 lux** inside the shielded recording room to stabilize baseline pupil size, temper retinal sensitivity, and prevent discomfort glare.
+    *   *Physical Distance & Visual Angle:* Fixed viewing distance of exactly **57.3 cm** from the monitor screen to the participant's eyes, making calculations mathematically convenient ($1\text{ cm} \approx 1^\circ$).
 
 ---
 
-## 3. Standardized EyeLink 1000 Plus Optimization Protocol
+## 4. Standardized EyeLink 1000 Plus Optimization Protocol (For June 11 Pupil Recordings)
+To guarantee low-noise, reproducible pupil and gaze records during tomorrow's physical runs, the following procedures have been standardized:
 
-To guarantee low-noise, reproducible pupil and gaze records, the following procedures are set for implementation:
-
-### 3.1. Calibration and Quality Control
-*   **5-Point Grid Calibration:** Configured with randomized target order and a **1000 ms auto-trigger pace**.
-*   **Trigger Timing Control:** Enforce a manual trigger delay of **0.5 to 1.0 second** (a brief pause) after the eye lands on the target before pressing ENTER. This allows post-saccadic micro-oscillations to settle, preventing grid distortion.
-*   **Single-Point Recovery:** Use the **Backspace key** to re-present and re-acquire any point where a participant blinks or loses focus, protecting the participant from fatigue by avoiding complete calibration restarts.
-*   **Strict Validation Cut-offs:**
-    *   Enforce a strict cutoff of **Average Error < 0.5°** and **Maximum Error < 1.0°** (exceeding standard clinical limits to meet rigorous visual neuroscience requirements).
-    *   If validation results in a "FAIR" or "POOR" rating, immediate recalibration must be performed.
-*   **Pupil Center Shift Mitigation:** The calibration screen background RGB values must be programmed to match the actual experiment background RGB values exactly. This eliminates the Pupil Center Shift phenomenon (where shifts in pupil size shift the calculated pupil center coordinate, introducing systematic errors).
-
-### 3.2. Camera & Threshold Tuning
-*   **Tracking Mode:** Standard Pupil-Corneal Reflection (Pupil-CR) tracking utilizing a Desktop Mount with a head-stabilized chin rest.
-*   **Algorithm Selection:** **Centroid mode** is selected as the default due to its extremely low noise floor. **Ellipse-Fitting mode** will only be utilized in cases of severe eyelid/eyelash occlusion.
-*   **Threshold Boundaries:** Target pupil thresholds will be maintained between **75 and 115** using the Up/Down Arrow keys. Corneal Reflection (CR) thresholds will be kept below **240** using the +/- keys, ensuring stable turquoise circles without corner smearing.
+*   **5-Point Grid Calibration:** Configured with randomized target order, a **1000 ms auto-trigger pace**, and a manual trigger delay of **0.5 to 1.0 second** to allow post-saccadic micro-oscillations to settle.
+*   **Strict Validation Cut-offs:** Average Error < 0.5° and Maximum Error < 1.0°. Immediate recalibration is performed if results return "FAIR" or "POOR".
+*   **Pupil Center Shift Mitigation:** Calibration screen background RGB values are programmed to match the actual experiment background RGB values exactly.
+*   **Camera Tuning:** Standard Pupil-CR tracking in Centroid mode. Pupil thresholds maintained between **75 and 115** and Corneal Reflection (CR) thresholds kept below **240**.
 
 ---
 
-## 4. Summary of Week 4 Experimental Parameters
+## 5. Summary of Week 4 Experimental Parameters
 
-| Parameter | Planned Value / Setting | Physiological / Technical Rationale |
+### 5.1. Slower Frequency Phantom Array Experiment (Executed June 10, 2026)
+
+| Parameter | Setting / Value | Physiological / Technical Rationale |
 |:---|:---|:---|
-| **Stimulus Frequency** | 1 Hz (Blue LED / Display) | Capture transient PLR and steady-state PIPR kinetics |
-| **Stimulus intensity** | 50 cd/m² (Luminance) | Prevents discomfort glare and associated blink-induced data loss |
-| **Duty Cycles** | 25%, 50%, 75% | Evaluate non-linear temporal summation and ipRGC pathway saturation |
-| **Twilight Adaptation** | 15 minutes (Mesopic) | Balance retinal light adaptation with prevention of drowsiness |
-| **Ambient Background** | 16.1 lux | Prevents drowsiness-induced miosis and keeps subjects alert |
+| **Stimulus Frequency** | 0 (DC control), 80, 160, 300, 500, and 1000 Hz | Target visual thresholds close to saccadic temporal integration limits |
+| **Stimulus Intensity** | Standard visual patterns, with and without Green LED | Evaluate chromatic background modulation of visual cortex pathways |
+| **Stimulus Modality** | Saccadic displacement + experimental Lambda variant | Assess perisaccadic visual breakthrough and saccadic-linked potentials |
+| **Adaptation Period** | Standard pre-run room adaptation | Rest and stabilize the baseline occipital cortex state before recording |
+| **Ambient Background** | Fixed ambient dim light environment | Standardize recording room baseline and prevent contrast sensitivity drift |
 | **Viewing Distance** | 57.3 cm | Mathematically convenient visual angle scaling ($1\text{ cm} \approx 1^\circ$) |
-| **Sampling Rate** | 1000 Hz | Captures millisecond-level pupillary constriction and recovery slopes |
-| **Calibration Mode** | 5-Point, Pupil-CR, Centroid | Ensure highest spatial-temporal accuracy with minimal noise floor |
-| **Validation Threshold** | Avg < 0.5°, Max < 1.0° | Academic-grade spatial accuracy cutoff |
+| **Sampling Rate** | 1000 Hz (EEG TOKAI Orb) | Capture millisecond-level EEG visual cortical potentials (Oz channel) |
+| **EEG Montage** | Occipital Queen's Square (PO7, O1, Oz, O2, PO8) | High spatial-temporal isolation of primary visual cortex activity |
+| **Calibration Mode** | Saccadic tracking task calibration | Ensure high spatial accuracy of rapid ocular displacement tracking |
+
+### 5.2. Blue Duty Cycle Pupil Experiment (Postponed to June 11, 2026)
+
+| Parameter | Setting / Value | Physiological / Technical Rationale |
+|:---|:---|:---|
+| **Stimulus Frequency** | 1 Hz flicker | Capture transient PLR and steady-state PIPR kinetics |
+| **Stimulus Intensity** | 50 cd/m² (Blue LED / Display) | Prevent discomfort glare and associated blink-induced data loss |
+| **Stimulus Modality** | 25%, 50%, and 75% Duty Cycles | Evaluate non-linear temporal summation and ipRGC pathway saturation |
+| **Adaptation Period** | 15 minutes (Mesopic Twilight adaptation) | Balance retinal light adaptation with prevention of sleepiness-induced miosis |
+| **Ambient Background** | 16.1 lux | Prevent sleepiness, stabilize baseline pupil size, and temper retinal sensitivity |
+| **Viewing Distance** | 57.3 cm | Mathematically convenient visual angle scaling ($1\text{ cm} \approx 1^\circ$) |
+| **Sampling Rate** | 1000 Hz (EyeLink 1000 Plus) | High-resolution capture of pupillary constriction and recovery slopes |
+| **Tracking System** | EyeLink 1000 Plus (Pupil-CR Centroid mode) | Ensure lowest noise floor for stable pupillary tracking |
+| **Calibration Mode** | 5-Point Grid Calibration (Avg < 0.5°, Max < 1.0°) | High clinical-grade spatial verification cutoffs |
 
 ---
 
-## 5. Planned Deliverables for Week 4
-1.  **Experimental Script Deployment:** Implement the 1 Hz blue flashing stimulation routine in Python/PyLink with synchronized backgrounds.
-2.  **Pilot Recording & Conversion:** Execute pilot recordings on the EyeLink 1000 Plus, producing `.EDF` raw data and converting them to `.ASC` files for analysis.
-3.  **Data Analysis Pipeline:** Develop Python analysis code to compute baseline pupil diameter, constriction amplitude, and Post-Illumination Pupillary Response (PIPR) parameters.
+## 6. Planned Deliverables for Week 4
+1.  **Slower Frequency PAE Analysis (Completed June 10):** Successfully completed EEG recordings for 0, 80, 160, 300, 500, and 1000 Hz (with/without Green LED + Lambda variant) for subject Takahira. The next step is to run ERSP time-frequency analyses to extract occipital gamma-band features across these conditions.
+2.  **Pupil Study Script Deployment (Completed June 10):** Preprocessor pipeline (`eyelink-1000Hz.ipynb`), artifact rejection algorithms (`eda.ipynb`), and standard protocol (`blue_duty_cycle_pupil_protocol.md`) are fully deployed.
+3.  **Saccade Detection & Dataset Verification (Planned for June 11):** Run the automated EOG saccade detection script (`detect_saccades.py`) on subject Takahira's slower-frequency EEG dataset and perform a comprehensive verification to validate trigger alignment and spatial ocular transitions.
+4.  **Pupil Pilot Recording (Planned for June 11):** Execute physical pilot recordings on the EyeLink 1000 Plus under the 25%, 50%, and 75% blue duty cycle conditions.
+5.  **Integrated Pupillary-Cortical Modeling (Ongoing):** Combine the completed slower-frequency EEG datasets with tomorrow's pupillometry results to model visual perisaccadic suppression breakthroughs and retinal temporal summation.
