@@ -130,11 +130,12 @@ def parse_eyelink_asc(file_path):
     return df
 
 if __name__ == "__main__":
-    # Define default input and output paths
-    input_path = "data/260611.asc"
-    output_path = "data/260611_parsed.csv"
+
+    input_path = input('Please enter Eyelink1000 exported ASCII(.asc) path: ')
+    output_path = input('Please enter output path: ')
     
     if os.path.exists(input_path):
+
         df = parse_eyelink_asc(input_path)
         print(f"Parsing complete. Shape of DataFrame: {df.shape}")
         
