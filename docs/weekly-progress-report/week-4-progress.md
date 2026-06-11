@@ -1,17 +1,17 @@
 # Weekly Progress Report (Week 4 Status Update)
 **Project Title**: Automating Ocular Tracking in Phantom Array Psychophysics & Pupillometry Bistability Analysis
 **Joint Research Collaboration**: Tokai Data Science and Brain Lab (Tokai University) & King Mongkut's Institute of Technology Ladkrabang (KMITL)
-**Date**: June 10, 2026 (Wednesday Update)
+**Date**: June 11, 2026 (Thursday Update)
 **Prepared by**: Jirayu Kaewsing & Research Assistant Team
 
 ---
 
 ## 1. Executive Summary
-This report outlines the experimental design, physiological rationales, active development achievements, and a critical redirection of physical lab recordings during Week 4 (June 8 – June 13, 2026) of the collaborative internship. While the initial technical focus of Week 4 has been the structural preparation and pipeline optimization for the upcoming **Blue Duty Cycle Pupil Study**, physical pupil recordings scheduled for today were postponed to tomorrow (Thursday, June 11, 2026) due to lab hardware allocation adjustments. 
+This report outlines the experimental design, physiological rationales, active development achievements, and physical lab recordings during Week 4 (June 8 – June 13, 2026) of the collaborative internship. Week 4 has marked major breakthroughs across both the **Phantom Array Experiment (PAE) Slower Frequency Protocol** and the newly initiated **Blue Duty Cycle Pupil Study**.
 
-In response, today's active lab session (Wednesday, June 10, 2026) was successfully dedicated to recording high-density visual EEG data from subject `Takahira` for the **Phantom Array Experiment (PAE) Slower Frequency Protocol**. By focusing on slower temporal light modulations (**0 Hz, 80 Hz, 160 Hz, 300 Hz, 500 Hz, and 1000 Hz**), this session specifically targeted the visual threshold frequencies where there is a high probability of encountering the conscious Phantom Array Effect (PAE). These trials were executed under two background chromatic conditions (**with and without a green LED** background) and included an advanced **Lambda variant** visual stimulation mode.
+Following the successful acquisition of high-density visual EEG data from subject `Takahira` during Lab Day 1 (Wednesday, June 10, 2026)—targeting the conscious Phantom Array visual thresholds (**0 Hz, 80 Hz, 160 Hz, 300 Hz, 500 Hz, and 1000 Hz**) under dual chromatic background configurations (with/without a green LED)—Lab Day 2 (Thursday, June 11, 2026) realized the complete physical execution of the pupillary pilot recordings. The **Blue Duty Cycle Pupil Experiment** was run on the EyeLink 1000 Plus across three distinct stimulus temporal duty cycles (**25%, 50%, and 75%**), providing high-fidelity raw ocular tracking and pupillary dynamics.
 
-Concurrently, the computational foundations for the Pupil Study were completed. This includes translating and standardizing the Japanese experimental protocol into English (`docs/en/blue_duty_cycle_pupil_protocol.md`), replacing legacy Excel/VBA scripts with a robust automated Python/pandas preprocessing pipeline, and implementing a sliding-window blink mask combined with Piecewise Cubic Hermite Interpolating Polynomial (`pchip`) interpolation to ensure continuous, low-noise ocular data collection once physical pupil recording commences tomorrow.
+In parallel with physical data acquisition, the computational infrastructure has been substantially expanded and deployed for joint laboratory use. A standalone command-line parser (`parse_asc.py`) with interactive user path routing was finalized to replace legacy Excel/VBA workflows. Furthermore, an online, zero-configuration Google Colab notebook variant (`colab_parsing_and_interpolation.ipynb`) was deployed to enable cross-platform, browser-based analysis. This pipeline incorporates a custom sliding-window blink mask and Piecewise Cubic Hermite Interpolating Polynomial (`pchip`) interpolation, which cleanly recovers pupillary traces from transient blink dropouts without generating overshoot artifacts. To support rapid training across international partners, complete bilingual documentation and setup instructions have been integrated into the repository in both English and Japanese. Finally, automated EOG-based saccade detection and EEGLAB event-mapping routines (`detect_saccades.py`) have been successfully validated on Takahira's EEG dataset, establishing a unified bridge between rapid eye movements and occipital cortical potentials.
 
 ---
 
@@ -21,6 +21,12 @@ Concurrently, the computational foundations for the Pupil Study were completed. 
 
 *   **Wednesday, June 10, 2026 (Lab Day 1)**:
     *   **High-Density EEG Recording (Slower Frequency PAE)**: Successfully recorded high-density visual EEG data from subject Takahira using the TOKAI Orb headband system (1000 Hz sampling rate, Queen's Square occipital montage: PO7, O1, Oz, O2, PO8). The session completed testing across a comprehensive array of slower stimulus frequencies: **0 Hz (control), 80 Hz, 160 Hz, 300 Hz, 500 Hz, and 1000 Hz**. These slower frequencies lie close to visual saccadic thresholds, offering a high likelihood of triggering the conscious Phantom Array Effect. Each frequency was tested across two background illumination profiles: **with and without green LED** background. In addition, we successfully recorded trials using the **Lambda variant** visual stimulation.
+*   **Thursday, June 11, 2026 (Lab Day 2)**:
+    *   **Physical EyeLink 1000 Plus Pupil Recording**: Completed the physical execution of the Blue Duty Cycle Pupil Experiment pilot. High-fidelity pupil diameter and gaze coordinate data were acquired during 1 Hz blue LED flicker stimulation (50 cd/m²) across 25%, 50%, and 75% duty cycles, following the standardized 15-minute mesopic twilight adaptation protocol.
+    *   **Interactive Command-Line Parser Deployment**: Upgraded the core Python preprocessing engine (`parse_asc.py`) with user-friendly, interactive path configurations. The parser converts ASCII exports from EyeLink into high-density pandas DataFrames. It automatically extracts EyeLink timestamps, computes relative elapsed time metrics (milliseconds and seconds), maps button-event transitions to synchronize stimulus state triggers (`blue_active`), and logs monocular raw pupil diameters and gaze coordinates.
+    *   **Google Colab Pipeline Integration**: Developed and released `colab_parsing_and_interpolation.ipynb`, a cloud-compatible version of the EyeLink pipeline designed to enable zero-setup execution. The notebook implements an advanced sliding-window mask to identify blink intervals (default `SLIDING_WINDOW_SIZE` of 200 ms) and reconstructs missing ocular segments using Piecewise Cubic Hermite Interpolating Polynomial (`pchip`) interpolation. It provides interactive parameters for threshold tuning, includes high-resolution matplotlib visual verification plots overlaying raw and PCHIP-cleaned traces with stimulus-shaded bands, and triggers automatic multi-format (CSV and Excel) data exports.
+    *   **Bilingual Setup & Deployment Documentation**: Configured a complete operational framework with bilingual step-by-step guides. The English guide (`docs/en/google_colab_setup.md`) and Japanese guide (`docs/jp/Google_Colab_セットアップガイド.md`) instruct researchers on importing the Colab workspace, adjusting window-size thresholds to avoid blink transition artifacts, verifying interpolation curves, and parsing output structures.
+    *   **Automated Saccade Detection on EEG Datasets**: Executed and validated the automated saccade-detection pipeline (`detect_saccades.py`) on subject Takahira's visual EEG dataset. The algorithm processes raw EOG channels through a 30 Hz low-pass filter, calculates velocity dynamics, and subjects candidate peaks to six rigorous quality gates (velocity outliers, EOG step amplitude, EEG overlap artifact checks, single-peak velocity contours, post-saccade fixation stability, and waveform monotonicity). Passing events are exported into a MATLAB-compatible command script (`add_saccade_events.m`) to automatically inject precise 'Saccade' latency markers into EEGLAB, synchronizing saccadic onset with occipital cortical potentials.
 
 ---
 
@@ -36,7 +42,7 @@ This protocol investigates the visual thresholds and electrophysiological signat
 *   **Lambda Variant Visual Stimulation:**
     *   *Saccadic-Linked Potentials:* The Lambda variant introduces specialized temporal frequency modulations linked to specific saccade profiles. This helps us isolate the visual "Lambda wave" (a positive post-saccadic potential generated in the visual cortex in response to the shift of a patterned image across the retina) and evaluate how temporal light modulation alters these automatic cortical potentials.
 
-### 3.2. Blue Duty Cycle Pupil Protocol (Postponed to June 11, 2026)
+### 3.2. Blue Duty Cycle Pupil Protocol (Executed June 11, 2026)
 This protocol investigates the light-response and temporal integration characteristics of intrinsically photosensitive retinal ganglion cells (ipRGCs) under blue flickering light using the Pupillary Light Reflex (PLR) as a physiological marker.
 
 *   **Visual Stimulation Parameters:** Blue flickering light modulated at a frequency of **1 Hz** with a luminance of **50 cd/m²** tested at three distinct duty cycles: **25%, 50%, and 75%** (delivered in 25% equal steps).
@@ -48,8 +54,8 @@ This protocol investigates the light-response and temporal integration character
 
 ---
 
-## 4. Standardized EyeLink 1000 Plus Optimization Protocol (For June 11 Pupil Recordings)
-To guarantee low-noise, reproducible pupil and gaze records during tomorrow's physical runs, the following procedures have been standardized:
+## 4. Standardized EyeLink 1000 Plus Optimization Protocol (Executed June 11, 2026)
+To guarantee low-noise, reproducible pupil and gaze records during the physical runs, the following procedures have been standardized:
 
 *   **5-Point Grid Calibration:** Configured with randomized target order, a **1000 ms auto-trigger pace**, and a manual trigger delay of **0.5 to 1.0 second** to allow post-saccadic micro-oscillations to settle.
 *   **Strict Validation Cut-offs:** Average Error < 0.5° and Maximum Error < 1.0°. Immediate recalibration is performed if results return "FAIR" or "POOR".
@@ -74,7 +80,7 @@ To guarantee low-noise, reproducible pupil and gaze records during tomorrow's ph
 | **EEG Montage** | Occipital Queen's Square (PO7, O1, Oz, O2, PO8) | High spatial-temporal isolation of primary visual cortex activity |
 | **Calibration Mode** | Saccadic tracking task calibration | Ensure high spatial accuracy of rapid ocular displacement tracking |
 
-### 5.2. Blue Duty Cycle Pupil Experiment (Postponed to June 11, 2026)
+### 5.2. Blue Duty Cycle Pupil Experiment (Executed June 11, 2026)
 
 | Parameter | Setting / Value | Physiological / Technical Rationale |
 |:---|:---|:---|
@@ -93,6 +99,6 @@ To guarantee low-noise, reproducible pupil and gaze records during tomorrow's ph
 ## 6. Planned Deliverables for Week 4
 1.  **Slower Frequency PAE Analysis (Completed June 10):** Successfully completed EEG recordings for 0, 80, 160, 300, 500, and 1000 Hz (with/without Green LED + Lambda variant) for subject Takahira. The next step is to run ERSP time-frequency analyses to extract occipital gamma-band features across these conditions.
 2.  **Pupil Study Script Deployment (Completed June 10):** Preprocessor pipeline (`eyelink-1000Hz.ipynb`), artifact rejection algorithms (`eda.ipynb`), and standard protocol (`blue_duty_cycle_pupil_protocol.md`) are fully deployed.
-3.  **Saccade Detection & Dataset Verification (Planned for June 11):** Run the automated EOG saccade detection script (`detect_saccades.py`) on subject Takahira's slower-frequency EEG dataset and perform a comprehensive verification to validate trigger alignment and spatial ocular transitions.
-4.  **Pupil Pilot Recording (Planned for June 11):** Execute physical pilot recordings on the EyeLink 1000 Plus under the 25%, 50%, and 75% blue duty cycle conditions.
-5.  **Integrated Pupillary-Cortical Modeling (Ongoing):** Combine the completed slower-frequency EEG datasets with tomorrow's pupillometry results to model visual perisaccadic suppression breakthroughs and retinal temporal summation.
+3.  **Saccade Detection & Dataset Verification (Completed June 11):** Ran the automated EOG saccade detection script (`detect_saccades.py`) on subject Takahira's slower-frequency EEG dataset and generated seamless MATLAB/EEGLAB trial events (`add_saccade_events.m`).
+4.  **Pupil Pilot Recording & Interactive Pipeline Deployment (Completed June 11):** Successfully executed physical pilot recordings on the EyeLink 1000 Plus under the 25%, 50%, and 75% blue duty cycle conditions, and delivered the interactive Python-based parser (`parse_asc.py`), Google Colab notebook (`colab_parsing_and_interpolation.ipynb`), and bilingual step-by-step documentation (`docs/en/google_colab_setup.md` / `docs/jp/Google_Colab_セットアップガイド.md`).
+5.  **Integrated Pupillary-Cortical Modeling (Ongoing):** Combine the completed slower-frequency EEG datasets with the pupil pilot datasets to model perisaccadic cortical suppression and pupil temporal integration kinetics.
