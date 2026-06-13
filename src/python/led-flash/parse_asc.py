@@ -104,16 +104,28 @@ def parse_eyelink_asc(file_path):
     if dedup_events:
         sorted_ts = sorted(dedup_events.keys())
         
-        # Find the standard active duration dynamically from the first complete pulse in this file
-        standard_duration = 750  # fallback default
+        # Find all complete pulse durations (1 followed by 0) to determine standard duration dynamically
+        durations = []
         for i in range(len(sorted_ts) - 1):
             ts_curr = sorted_ts[i]
-            ts_next = sorted_ts[i+1]
             state_curr = dedup_events[ts_curr]
-            state_next = dedup_events[ts_next]
-            if state_curr == 1 and state_next == 0:
-                standard_duration = ts_next - ts_curr
-                break
+            if state_curr == 1:
+                # Find the next event that is 0
+                for j in range(i + 1, len(sorted_ts)):
+                    ts_next = sorted_ts[j]
+                    state_next = dedup_events[ts_next]
+                    if state_next == 0:
+                        durations.append(ts_next - ts_curr)
+                        break
+                    elif state_next == 1:
+                        # Another ON event occurred before an OFF event, so this was not completed normally
+                        break
+                        
+        # Determine the standard active duration (median of all completed pulses) to filter out startup noise
+        if durations:
+            standard_duration = int(np.median(durations))
+        else:
+            standard_duration = 750  # fallback default
                 
         # Scan and insert off-events for any on-event that lacks one
         new_events = {}
