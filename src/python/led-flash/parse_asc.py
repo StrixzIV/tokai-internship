@@ -42,6 +42,10 @@ def parse_eyelink_asc(file_path):
             parts = line.split()
             first_word = parts[0]
             
+            # Discard eye tracking event lines explicitly to prevent disruption in sample/timestamp parsing
+            if first_word in {"EFIX", "SFIX", "SSACC", "ESACC", "EBLINK", "SBLINK", "MSG", "START", "END", "PRESCALER", "VPRESCALER", "PUPIL", "EVENTS", "SAMPLES"}:
+                continue
+            
             # Check if this is a sample line (starts with an integer timestamp)
             try:
                 ts = int(first_word)
@@ -68,18 +72,33 @@ def parse_eyelink_asc(file_path):
                     pupil_size.append(0.0)
                     
             except ValueError:
-                # Event line (e.g. MSG, BUTTON, SFIX, etc.)
+                # Event line (e.g. BUTTON or INPUT)
                 if first_word == "BUTTON" and len(parts) >= 4:
                     try:
                         btn_ts = int(parts[1])
-                        btn_id = int(parts[2])
                         btn_state = int(parts[3])
-                        button_events.append((btn_ts, btn_id, btn_state))
+                        button_events.append((btn_ts, "BUTTON", btn_state))
+                    except ValueError:
+                        pass
+                elif first_word == "INPUT" and len(parts) >= 3:
+                    try:
+                        inp_ts = int(parts[1])
+                        inp_val = int(parts[2])
+                        # Treat 127 as off (0), other inputs (like 63) as on (1)
+                        inp_state = 0 if inp_val == 127 else 1
+                        button_events.append((inp_ts, "INPUT", inp_state))
                     except ValueError:
                         pass
 
-    # Sort button events chronologically just in case they appear out of order
+    # Sort and deduplicate events at identical timestamps (retaining/prioritizing BUTTON states if they overlap)
     button_events.sort(key=lambda x: x[0])
+    dedup_events = {}
+    for ts, ev_type, state in button_events:
+        if ts not in dedup_events:
+            dedup_events[ts] = state
+        else:
+            if ev_type == "BUTTON":
+                dedup_events[ts] = state
     
     # Convert samples to numpy arrays
     ts_arr = np.array(timestamps, dtype=np.int64)
@@ -88,15 +107,10 @@ def parse_eyelink_asc(file_path):
     pupil_size_arr = np.array(pupil_size, dtype=np.float64)
     
     # Map button events to samples to check when blue light is active
-    # For any sample timestamp T, blue_active is determined by the state of the 
-    # latest BUTTON event that occurred on or before T.
-    if button_events:
-        btn_ts_list, btn_ids, btn_states = zip(*button_events)
-        btn_ts_arr = np.array(btn_ts_list, dtype=np.int64)
-        btn_states_arr = np.array(btn_states, dtype=np.int64)
+    if dedup_events:
+        btn_ts_arr = np.array(sorted(dedup_events.keys()), dtype=np.int64)
+        btn_states_arr = np.array([dedup_events[ts] for ts in btn_ts_arr], dtype=np.int64)
         
-        # np.searchsorted(btn_ts_arr, ts_arr, side='right') returns the index i 
-        # such that btn_ts_arr[i-1] <= ts_arr < btn_ts_arr[i]
         indices = np.searchsorted(btn_ts_arr, ts_arr, side="right") - 1
         
         # Create the state mask: default to 0 for timestamps before the first button event
@@ -104,7 +118,7 @@ def parse_eyelink_asc(file_path):
         valid_mask = (indices >= 0)
         blue_active[valid_mask] = btn_states_arr[indices[valid_mask]]
     else:
-        print("Warning: No BUTTON events found in the file.")
+        print("Warning: No BUTTON/INPUT events found in the file.")
         blue_active = np.zeros_like(ts_arr, dtype=np.int64)
         
     # Calculate elapsed_ms and elapsed_sec relative to the first sample timestamp
