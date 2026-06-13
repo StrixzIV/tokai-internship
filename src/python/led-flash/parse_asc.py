@@ -99,6 +99,44 @@ def parse_eyelink_asc(file_path):
         else:
             if ev_type == "BUTTON":
                 dedup_events[ts] = state
+
+    # Handle case where flash does not turn off (auto-cutoff based on dynamic duration of other complete flashes)
+    if dedup_events:
+        sorted_ts = sorted(dedup_events.keys())
+        
+        # Find the standard active duration dynamically from the first complete pulse in this file
+        standard_duration = 750  # fallback default
+        for i in range(len(sorted_ts) - 1):
+            ts_curr = sorted_ts[i]
+            ts_next = sorted_ts[i+1]
+            state_curr = dedup_events[ts_curr]
+            state_next = dedup_events[ts_next]
+            if state_curr == 1 and state_next == 0:
+                standard_duration = ts_next - ts_curr
+                break
+                
+        # Scan and insert off-events for any on-event that lacks one
+        new_events = {}
+        i = 0
+        while i < len(sorted_ts):
+            ts_curr = sorted_ts[i]
+            state_curr = dedup_events[ts_curr]
+            new_events[ts_curr] = state_curr
+            
+            if state_curr == 1:
+                has_off = False
+                if i + 1 < len(sorted_ts):
+                    ts_next = sorted_ts[i+1]
+                    state_next = dedup_events[ts_next]
+                    if state_next == 0 and (ts_next - ts_curr) < (standard_duration * 1.5):
+                        has_off = True
+                
+                if not has_off:
+                    art_off_ts = ts_curr + standard_duration
+                    new_events[art_off_ts] = 0
+            i += 1
+            
+        dedup_events = new_events
     
     # Convert samples to numpy arrays
     ts_arr = np.array(timestamps, dtype=np.int64)
