@@ -34,8 +34,12 @@ The notebook is divided into four main steps. Run each cell sequentially by clic
   - *When to decrease*: If valid baseline pupil measurements are being cut off unnecessarily, decrease this value to `100` or `150`.
   - To change it, edit `SLIDING_WINDOW_SIZE = 200` in the cell code before running.
 
-### Step 3: Visualize the Pupil Response
-- Run the code cell in **Step 3** to plot the pupil diameter over time.
+### Step 3a: Visualize the Raw Uncleaned Data
+- Run the code cell in **Step 3a** to plot the raw uncleaned pupil size.
+- This cell displays the raw pupil diameter over time, showing the distinct drops to zero during blink events and tracker dropouts. The active blue LED stimulus blocks are overlaid in the background.
+
+### Step 3b: Visualize the Interpolation Quality (Raw vs. Cleaned Overlay)
+- Run the code cell in **Step 3b** to compare raw and PCHIP-interpolated data.
 - **Verification**:
   - The **light gray line** shows the raw pupil size (with drops to `0` during blinks).
   - The **dark green line** shows the cleaned pupil size (smoothed over blinks using PCHIP interpolation).
