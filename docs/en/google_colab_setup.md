@@ -65,7 +65,5 @@ The exported files contain the following columns:
 | `elasped_ms` | Integer | Elapsed time in milliseconds from the start of the recording. |
 | `elasped_sec` | Float | Elapsed time in seconds from the start of the recording. |
 | `blue_active` | Binary (0/1) | Stimulus indicator (1 if Blue LED is active, 0 otherwise) reconstructed from Eyelink `BUTTON` events. |
-| `gaze_x` | Float | Gaze horizontal coordinate (`NaN` during blinks). |
-| `gaze_y` | Float | Gaze vertical coordinate (`NaN` during blinks). |
 | `pupil_size` | Float | Raw pupil diameter (monocular left eye, `0.0` during blinks). |
 | `cleaned_pupil_size` | Float | Cleaned pupil diameter after PCHIP blink interpolation (only in `_cleaned` files). |

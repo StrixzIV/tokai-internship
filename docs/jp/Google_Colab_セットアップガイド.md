@@ -1,6 +1,6 @@
 # Google Colab ノートブック セットアップ & 使用ガイド
 
-このドキュメントでは、EyeLink `.asc` ファイル of 解析および PCHIP 瞬き補間を実行するための Google Colab ノートブックのセットアップ手順と使用方法について説明します。
+このドキュメントでは、EyeLink `.asc` ファイルの解析および PCHIP 瞬き補間を実行するための Google Colab ノートブック of セットアップ手順と使用方法について説明します。
 
 コラボノートブックはリポジトリ内の以下の場所に保存されています：
 `src/python/led-flash/colab_parsing_and_interpolation.ipynb`
@@ -9,7 +9,7 @@
 
 ## 1. Google Colab でノートブックを開く
 
-1. グラフウェブブラウザを開き、[Google Colab](https://colab.research.google.com) にアクセスします。
+1. ウェブブラウザを開き、[Google Colab](https://colab.research.google.com) にアクセスします。
 2. Google アカウントでサインインします。
 3. ポップアップダイアログで **アップロード (Upload)** タブを選択します。
 4. ローカルリポジトリから `colab_parsing_and_interpolation.ipynb` ファイルをドラッグ＆ドロップするか、**ファイルの選択 (Choose File)** をクリックしてファイルを選択します。
@@ -43,7 +43,7 @@
 - **検証ポイント**:
   - **薄グレーの線**: 生の瞳孔径データ（瞬き中は `0` に急降下している部分）。
   - **濃い緑の線**: クリーニング済みの瞳孔径データ（PCHIP補間により瞬きギャップが滑らかに繋がっている部分）。
-  - **薄青の背景ブロック**: 青色LED刺激がアクティブ（`blue_active = 1`）だった時間帯を示します。
+  - **薄青 of 背景ブロック**: 青色LED刺激がアクティブ（`blue_active = 1`）だった時間帯を示します。
   - 緑の線が、オーバーシュート（波打ち）を起こさずに瞬きの隙間を滑らかに補間できているか確認してください。
 
 ### ステップ 4: エクスポートとダウンロード
@@ -65,7 +65,5 @@
 | `elasped_ms` | 整数型 (Int) | 記録開始時点からの経過ミリ秒。 |
 | `elasped_sec` | 浮動小数点型 (Float) | 記録開始時点からの経過秒。 |
 | `blue_active` | バイナリ型 (0/1) | 青色LED刺激の状態（1でオン、0でオフ）。Eyelink の `BUTTON` イベントから再構築。 |
-| `gaze_x` | 浮動小数点型 (Float) | 視線の水平座標（瞬き中は `NaN`）。 |
-| `gaze_y` | 浮動小数点型 (Float) | 視線の垂直座標（瞬き中は `NaN`）。 |
 | `pupil_size` | 浮動小数点型 (Float) | 生の瞳孔径（単眼・左目、瞬き中は `0.0`）。 |
 | `cleaned_pupil_size` | 浮動小数点型 (Float) | PCHIP瞬き補間後の瞳孔径（`_cleaned` ファイルにのみ含まれます）。 |
