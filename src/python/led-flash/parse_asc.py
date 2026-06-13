@@ -43,7 +43,7 @@ def parse_eyelink_asc(file_path):
             first_word = parts[0]
             
             # Discard eye tracking event lines explicitly to prevent disruption in sample/timestamp parsing
-            if first_word in {"EFIX", "SFIX", "SSACC", "ESACC", "EBLINK", "SBLINK", "MSG", "START", "END", "PRESCALER", "VPRESCALER", "PUPIL", "EVENTS", "SAMPLES"}:
+            if first_word in {"EFIX", "SFIX", "EBLINK", "SBLINK", "MSG", "PRESCALER", "VPRESCALER", "PUPIL", "EVENTS", "SAMPLES"}:
                 continue
             
             # Check if this is a sample line (starts with an integer timestamp)
