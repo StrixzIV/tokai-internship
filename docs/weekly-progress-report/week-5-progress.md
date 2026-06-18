@@ -50,6 +50,7 @@ Third, a structured codebase transfer and knowledge handoff framework was initia
 *   **Initiation of Research and Codebase Handoff (June 18, 2026)**:
     *   **Work Transfer and Documentation Strategy**: Commenced a structured work transfer process to prepare for a comprehensive codebase and experimental handoff to the next generation of researchers. This prep ensures long-term reproducibility and operational continuity for both the ocular tracking and pupillometry research programs.
     *   **Peer Training and Knowledge Handoff**: Conducted an active peer-teaching session for other potential laboratory candidates, walking them through the physical experimental setups, data-acquisition pipelines, and statistical analysis scripts (such as the parsing, interpolation, and dual-metric evaluation notebooks).
+    *   **Timeline and Automation Sunset**: Established a firm operational finalization date of June 24, 2026, at 17:00, at which point all collaborative activities with the Data Science and Brain Lab at Tokai University will be completed, and all associated analytical routines, scheduled automation systems, and background cron jobs will be systematically deactivated.
 
 ---
 
@@ -137,3 +138,7 @@ The major structural and operational goals planned for the previous phase have b
 1.  **Batch Processing of Duty-Cycle Datasets**: Utilize the finalized protocol to complete additional experimental recording runs across multiple participants. Process these new datasets in batch using the parameterized Colab and local statistical pipelines to verify individual responses under 25%, 50%, and 75% blue duty cycles.
 2.  **Non-Linear Temporal Summation Modeling**: Conduct statistical modeling (e.g., repeated-measures ANOVA or non-linear curve fitting) on the extracted Early and Late AUC metrics to assess if ipRGC-mediated pupillary constriction scales linearly with duty-cycle light energy exposure or exhibits plateauing behaviors due to melanopsin pathway saturation.
 3.  **Cross-Subject Visual Threshold Integrations**: Continue integrating the occipital EEG data (from the slower-frequency Phantom Array sessions) with the pupillary dynamics to map perisaccadic visual suppression thresholds against pupillary light-adaptation levels, building an integrated visual-autonomic model.
+
+### 4.3. Finalization of Research Operations & Systems Deactivation
+*   **Finalization Date**: All active experimental, analytical, and collaborative work related to the Data Science and Brain Lab at Tokai University will be fully concluded and finalized on June 24, 2026, at 17:00.
+*   **Automation Deactivation**: Following this finalization time, all active analytical routines, automated data acquisition tools, background cron jobs, and scheduled reporting pipelines will be permanently deactivated and retired.
