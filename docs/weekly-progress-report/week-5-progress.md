@@ -1,23 +1,25 @@
 # Weekly Progress Report (Week 5 Status Update)
 **Project Title**: Automating Ocular Tracking in Phantom Array Psychophysics & Pupillometry Bistability Analysis
 **Joint Research Collaboration**: Tokai Data Science and Brain Lab (Tokai University) & King Mongkut's Institute of Technology Ladkrabang (KMITL)
-**Date**: June 17, 2026 (Wednesday Progress Report)
+**Date**: June 18, 2026 (Thursday Progress Report)
 **Prepared by**: Jirayu Kaewsing & Research Assistant Team
 
 ---
 
 ## 1. Executive Summary
-This progress report documents the key technical developments, experimental standardizations, and computational refinements accomplished during Week 5 (June 14 – June 17, 2026) of the collaborative internship. This week’s progress successfully addresses two major pillars of the joint research program: the formal consolidation of physical experimental protocols and the advanced generalization of statistical evaluation pipelines.
+This progress report documents the key technical developments, experimental standardizations, computational refinements, and academic handoff procedures accomplished during Week 5 (June 14 – June 18, 2026) of the collaborative internship. This week’s progress successfully addresses three major pillars of the joint research program: the formal consolidation of physical experimental protocols, the advanced generalization of statistical evaluation pipelines, and the initiation of structured codebase handoff and peer training.
 
 First, the experimental framework for the pupillometry studies was formally standardized through the finalization and check-in of a highly rigorous, simplified clinical-grade guide, the "EyeLink 1000 Plus Pupillometry Study: Simplified Experiment Protocol" (`pupil-experiment-protocol.md`), alongside a corresponding Japanese simplified version in MS Word format (`docs/jp/実験手順(簡易版).docx`). This protocol codifies a step-by-step checklist of physical materials, participant chin-rest alignment, 15-minute mesopic twilight adaptation, tracking thresholds, 5-point grid calibration limits, and trial sequence timing to eliminate inter-session measurement variance and guarantee cross-site experimental replication.
 
 Second, the statistical evaluation architecture in `statistical_evaluation.ipynb` was significantly upgraded and generalized. To transition from a rigid static analysis to a flexible, reproducible modeling engine, a dedicated global configuration block was introduced, abstracting baseline window lengths, early/late Area Under the Curve (AUC) bounds, and Post-Illumination Pupillary Response (PIPR) sampling times. Additionally, the analytical engine was expanded to compute and export a dual-metric feature suite consisting of both **Normalized Constriction** and **Raw Physical Constriction** metrics. This enables researchers to perform dual-layer statistical evaluations: normalized AUC/PIPR to isolate intrinsic photoreceptor sensitivities across individuals, and raw physical AUC/PIPR to quantify absolute pupil diameter limits and system tracking dynamics. These updates represent a critical step toward high-throughput, standardized modeling of intrinsically photosensitive retinal ganglion cell (ipRGC) and melanopsin-driven pupillary kinetics.
 
+Third, a structured codebase transfer and knowledge handoff framework was initiated to guarantee long-term continuity and high-fidelity replication of both the pupillometry and Phantom Array experiments. Key potential candidates from the laboratory were trained on the physical experimental setups, data-acquisition systems, and computational pipelines, establishing a robust transition path for the next generation of researchers taking over these projects.
+
 ---
 
 ## 2. Progress Details
 
-### Week 5 (June 14 – June 17, 2026): Protocol Standardization & Dual-Metric Analytics Refinement
+### Week 5 (June 14 – June 18, 2026): Protocol Standardization, Dual-Metric Analytics, and Codebase Handoff Prep
 
 *   **Finalization of the Standardized EyeLink 1000 Plus Protocol (June 17, 2026)**:
     *   **Academic and Operational Guidelines**: Completed and deployed the dual-language physical testing protocol. The English version (`docs/en/pupil-experiment-protocol.md`) and the simplified Japanese version (`docs/jp/実験手順(簡易版).docx`) establish a clinical baseline for pupillometry runs.
@@ -44,6 +46,10 @@ Second, the statistical evaluation architecture in `statistical_evaluation.ipynb
         6.  *Normalized PIPR*: normalized constriction value at exactly $T_{offset} + PIPR\_TIME\_SEC$ seconds.
         7.  *Raw PIPR*: raw pupil constriction in tracking units at exactly $T_{offset} + PIPR\_TIME\_SEC$ seconds.
     *   **Expanded Visualization and Tabular Export**: Modified the plotting engine to generate three diagnostic panels, with Panel 3 dynamically displaying the full dual-metric text overlay (combining Normalized and Raw parameters side-by-side). Rewrote the file exporting sequence to map relative paths to `../../../out` (with fallback to `./out`), outputting expanded tables `260611_metrics.csv` and `260611_metrics.xlsx` that support comprehensive downstream statistical modeling across subjects.
+
+*   **Initiation of Research and Codebase Handoff (June 18, 2026)**:
+    *   **Work Transfer and Documentation Strategy**: Commenced a structured work transfer process to prepare for a comprehensive codebase and experimental handoff to the next generation of researchers. This prep ensures long-term reproducibility and operational continuity for both the ocular tracking and pupillometry research programs.
+    *   **Peer Training and Knowledge Handoff**: Conducted an active peer-teaching session for other potential laboratory candidates, walking them through the physical experimental setups, data-acquisition pipelines, and statistical analysis scripts (such as the parsing, interpolation, and dual-metric evaluation notebooks).
 
 ---
 
@@ -125,6 +131,7 @@ The major structural and operational goals planned for the previous phase have b
 - [x] **Analytical Parameterization**: Engineered a global parameter configuration block in the statistical notebook to support flexible, adjustable time windows.
 - [x] **Dual-Metric Analytical Suite**: Upgraded the computational engine to simultaneously extract both Normalized and Raw physical features (Baseline, Early AUC, Late AUC, and PIPR at customizable timeframes) to enable parallel biomechanical and physiological modeling.
 - [x] **Tabular Feature Exporters**: Enhanced saving routines to output multi-metric summary tables directly into the centralized `out/` folder structure, fully verified through relative directory alignment.
+- [x] **Codebase Handoff & Training**: Initiated the work transfer and documentation strategy to prepare for codebase handoff to the next generation of researchers, with physical peer training sessions conducted for potential candidates.
 
 ### 4.2. Upcoming Research Objectives (Week 5–6)
 1.  **Batch Processing of Duty-Cycle Datasets**: Utilize the finalized protocol to complete additional experimental recording runs across multiple participants. Process these new datasets in batch using the parameterized Colab and local statistical pipelines to verify individual responses under 25%, 50%, and 75% blue duty cycles.
