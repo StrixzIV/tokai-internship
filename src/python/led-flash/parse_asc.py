@@ -33,6 +33,7 @@ def parse_eyelink_asc(file_path):
     button_events = [] # List of tuples: (btn_timestamp, button_id, state)
 
     print(f"Reading Eyelink ASC file: {file_path}")
+    in_recording = False
     with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
         for line in f:
             line = line.strip()
@@ -42,6 +43,16 @@ def parse_eyelink_asc(file_path):
             parts = line.split()
             first_word = parts[0]
             
+            if first_word == "START":
+                in_recording = True
+                continue
+            elif first_word == "END":
+                in_recording = False
+                continue
+                
+            if not in_recording:
+                continue
+                
             # Discard eye tracking event lines explicitly to prevent disruption in sample/timestamp parsing
             if first_word in {"EFIX", "SFIX", "EBLINK", "SBLINK", "MSG", "PRESCALER", "VPRESCALER", "PUPIL", "EVENTS", "SAMPLES"}:
                 continue
@@ -126,6 +137,25 @@ def parse_eyelink_asc(file_path):
             standard_duration = int(np.median(durations))
         else:
             standard_duration = 750  # fallback default
+                
+        # Scan chronologically to reconstruct any orphan OFF events (state 0 when last_state was 0)
+        reconstructed_events = {}
+        last_state = 0
+        for ts in sorted_ts:
+            state = dedup_events[ts]
+            if state == 1:
+                reconstructed_events[ts] = 1
+                last_state = 1
+            elif state == 0:
+                if last_state == 0:
+                    # Inferred ON event exactly standard_duration before the OFF event
+                    inferred_on_ts = ts - standard_duration
+                    reconstructed_events[inferred_on_ts] = 1
+                reconstructed_events[ts] = 0
+                last_state = 0
+                
+        dedup_events = reconstructed_events
+        sorted_ts = sorted(dedup_events.keys())
                 
         # Scan and insert off-events for any on-event that lacks one
         new_events = {}
