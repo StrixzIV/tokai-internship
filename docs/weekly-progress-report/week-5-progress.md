@@ -1,7 +1,7 @@
 # Weekly Progress Report (Week 5 Status Update)
 **Project Title**: Automating Ocular Tracking in Phantom Array Psychophysics & Pupillometry Bistability Analysis
 **Joint Research Collaboration**: Tokai Data Science and Brain Lab (Tokai University) & King Mongkut's Institute of Technology Ladkrabang (KMITL)
-**Date**: June 18, 2026 (Thursday Progress Report)
+**Date**: June 20, 2026 (Saturday Progress Report)
 **Prepared by**: Jirayu Kaewsing & Research Assistant Team
 
 ---
@@ -15,7 +15,7 @@ Second, the statistical evaluation architecture in `statistical_evaluation.ipynb
 
 Third, during Lab Day 2 (Thursday, June 18, 2026), a structured codebase transfer and knowledge handoff framework was initiated to guarantee long-term continuity and high-fidelity replication of both the pupillometry and Phantom Array experiments. Key potential candidates from the laboratory were trained on the physical experimental setups, data-acquisition systems, and computational pipelines, establishing a robust transition path for the next generation of researchers taking over these projects. To ensure an orderly conclusion of the collaborative research, a firm operational finalization date of June 24, 2026, was established, accompanied by a structured timeline for the permanent deactivation of associated background cron automation systems and reporting routines.
 
-Finally, Lab Day 3 (Saturday, June 20, 2026) is designated for the final codebase packaging, peer review of the data analysis pipelines, repository path auditing, and transition readiness sign-off, representing the concluding operational phase of this research period.
+Finally, during Lab Day 3 (Saturday, June 20, 2026), the final codebase packaging, peer review of the data analysis pipelines, repository path auditing, and transition readiness sign-off were successfully executed, representing the concluding operational phase of this research period. Crucially, the preprocessing pipelines in `colab_parsing_and_interpolation.ipynb`, `eyelink-1000Hz.ipynb`, and the parsing module `parse_asc.py` were enhanced with advanced signal conditioning algorithms. These updates clean high-frequency saccadic spikes and blink artifacts using combined Boolean masking, prevent PCHIP boundary extrapolation instabilities via localized inner-domain interpolation backed by stable edge-filling, and filter out pre-recording calibration coordinates through chronological state gating. In addition, an event reconstruction engine was implemented to infer and restore missing stimulus-off transition frames based on temporal duration baselines, ensuring high signal-to-noise ratio (SNR) datasets and complete synchronization across all analytical runs.
 
 ---
 
@@ -54,10 +54,15 @@ Finally, Lab Day 3 (Saturday, June 20, 2026) is designated for the final codebas
         *   **Peer Training and Knowledge Handoff**: Conducted an active peer-teaching session for other potential laboratory candidates, walking them through the physical experimental setups, data-acquisition pipelines, and statistical analysis scripts (such as the parsing, interpolation, and dual-metric evaluation notebooks).
         *   **Timeline and Automation Sunset**: Established a firm operational finalization date of June 24, 2026, at 17:00, at which point all collaborative activities with the Data Science and Brain Lab at Tokai University will be completed, and all associated analytical routines, scheduled automation systems, and background cron jobs will be systematically deactivated.
 
-*   **Saturday, June 20, 2026 (Lab Day 3 - Planned Operations)**:
-    *   **Collaborative Codebase Handoff Review**: Schedule and conduct a final walk-through review with the incoming laboratory research team to verify their independent ability to execute the full automated preprocessing, interpolation, and dual-metric statistical evaluation pipelines.
-    *   **System and Data Alignment Auditing**: Perform a comprehensive audit of the local and Google Drive repository folders (aligning the standardized `out/` and `docs/` paths) to confirm that all experimental records, compiled metrics spreadsheets, and bilingual setup guides are neatly indexed and formatted.
-    *   **Automation Sunset Preparations**: Establish the systematic deactivation sequence for the automated progress reporting scripts and background cron scheduling tools, ensuring that the final automated report delivery scheduled for next week is the concluding delivery of the program.
+*   **Saturday, June 20, 2026 (Lab Day 3 - Complete Walkthrough, Signal Processing Advancements, and Transition Auditing)**:
+    *   **Completion of Collaborative Codebase Handoff Review**: Conducted a highly successful, hands-on walkthrough with the incoming research team at the Data Science and Brain Lab. The session verified their independent capability to compile, run, and scale the automated ocular preprocessing, PCHIP interpolation, and dual-metric statistical evaluation pipelines.
+    *   **Comprehensive Signal Conditioning and Artifact Cleansing**:
+        *   *Saccadic Spike Removal*: Integrated an automated saccadic artifact filter by overlaying the EyeLink hardware-identified saccade events onto the primary pupil-diameter signal. Together with the pre-existing blink event masks, these intervals are dynamically flagged as invalid and assigned `NaN` values, preventing rapid ocular adjustments (saccadic spikes) from corrupting downstream averages.
+        *   *Eyelink Calibration Stream Gating*: Designed a strict logical parser gate using Eyelink's `START` and `END` marker events. The system now ignores any samples or messages generated outside active recording sessions, successfully isolating and filtering out the pre-recording calibration coordinates, and preventing baseline calibration noise.
+        *   *PCHIP Boundary Extrapolation Control*: Resolved numerical instability issues where the Piecewise Cubic Hermite Interpolating Polynomial (PCHIP) would construct divergent, erratic estimations at the extreme edges of the recordings. This was resolved by enforcing `limit_area='inside'` within the interpolation function—restricting PCHIP to internal data gaps—and resolving the boundaries using a combination of forward-fill (`ffill()`) and backward-fill (`bfill()`) algorithms to maintain edge-state stability.
+        *   *Orphan Event Recovery Gating*: Implemented a robust chronological parser scan that checks state changes across the recording timeline. In instances where an "orphan" light-off event is detected without a preceding light-on trigger (due to rare sampling start offsets or package drops), the algorithm automatically infers and reconstructs the corresponding light-on event at exactly one standard duration (e.g., 750 ms) prior, guaranteeing correct trial-by-trial alignment.
+    *   **System and Repository Alignment Auditing**: Executed a comprehensive repository path audit across local drives and shared Google Drive directories, aligning directory pointers to standardized relative paths (`../../../out` and `./out`) and confirming that all experimental records, bilingual guidelines, and generated metric tables are systematically indexed.
+    *   **Automation Sunset Preparations**: Scheduled the systematic deactivation of the background progress reporting mechanisms and cron automation jobs, finalizing the transition package so that the upcoming week-6 reporting marks the clean termination of the automation lifecycle.
 
 ---
 
@@ -128,6 +133,36 @@ The analytical expansion to include raw physical metrics alongside normalized me
 *   **Inter-Individual Normalization**: Normalized metrics ($\text{NormalizedConstriction}$) eliminate anatomical variations in pupil sizes, allowing direct comparison of photoreceptor and ipRGC pathway sensitivity between different human subjects.
 *   **Absolute Tracking and Biomechanical Modeling**: Raw metrics ($\text{RawConstriction}$) capture the physical extent of iris sphincter muscle displacement. This is vital for biomechanics of the iris, verifying sensor noise floors across the EyeLink tracking system, and assessing absolute constriction limits (to check if subjects approach mechanical saturation under bright duty cycle stimuli).
 
+### 3.4. Advanced Signal Conditioning & Numerical Boundary Stabilization
+To ensure physical pupil-diameter measurements represent pure physiological activity without ocular or mathematical artifacts, several advanced signal conditioning techniques were mathematically and programmatically integrated:
+
+1.  **Saccadic and Blink Artifact Masking**:
+    Let $S_t \in \{0, 1\}$ and $B_t \in \{0, 1\}$ represent Boolean indicators for saccades and blinks at time $t$ respectively, where a value of 1 represents event detection. An expanded combined event mask $M_t$ is constructed to gate the raw pupil size signal $A_t$:
+    $$M_t = \text{BlinkMask}_t \lor \text{SaccadeMask}_t$$
+    The cleaned signal $A'_{t}$ is obtained by applying the mask:
+    $$A'_{t} = \begin{cases} \text{NaN} & \text{if } M_t = 1 \\ A_t & \text{if } M_t = 0 \end{cases}$$
+
+2.  **Piecewise Cubic Hermite Interpolating Polynomial (PCHIP) Gating**:
+    PCHIP is utilized to interpolate over internal intervals of missing data (the $\text{NaN}$ gaps created by $M_t$) because it preserves the monotonicity of the data and avoids the overshoot problems associated with standard cubic splines. However, evaluating cubic polynomials beyond the interval of valid data (extrapolation) introduces extreme boundary divergence:
+    $$\lim_{t \to \pm\infty} |P(t)| = \infty$$
+    To prevent this, the interpolation domain is strictly bounded to the inner interval of valid data ($[t_{first}, t_{last}]$):
+    $$A'_{t} = \text{interpolate}\left(A'_{t}, \text{method='pchip'}, \text{limit\_area='inside'}\right)$$
+    For boundary intervals ($t < t_{first}$ and $t > t_{last}$), a stable constant fill is applied using back-fill ($\text{bfill}$) and forward-fill ($\text{ffill}$):
+    $$A'_{t} = \begin{cases} A'_{t_{first}} & \text{for } t < t_{first} \\ A'_{t_{last}} & \text{for } t > t_{last} \end{cases}$$
+    This dual-stage fill eliminates extreme artifactual spikes at the beginning and end of recording files.
+
+3.  **Active-Glow Chronological Gating**:
+    To eliminate non-experimental transient eye movements and calibration coordinates, recording bounds are gated dynamically by checking for Eyelink `START` and `END` stream markers. Let $T_{START}$ and $T_{END}$ be the recorded timestamps of these markers. The temporal sample series is filtered to satisfy:
+    $$\mathcal{T}_{valid} = \{t \mid T_{START} \le t \le T_{END}\}$$
+    All data samples where $t \notin \mathcal{T}_{valid}$ are discarded, ensuring the pre-stimulus baseline values are not contaminated by prior calibration or validation routines.
+
+4.  **Chronological State Transition Reconstruction**:
+    Let $E_k = (t_k, s_k)$ represent the $k$-th recorded event in chronological order, where $s_k \in \{0, 1\}$ represents the digital stimulus state ($1 = \text{ON}$, $0 = \text{OFF}$). If the chronological event stream contains adjacent identical states:
+    $$s_k = 0 \quad \text{and} \quad s_{k-1} = 0$$
+    it indicates a missing transition event ($s = 1$). A reconstructed "ON" event is automatically synthesized and inserted at a fixed standard duration offset ($D_{stimulus} = 750\text{ ms}$):
+    $$E_{new} = (t_k - D_{stimulus}, 1)$$
+    This ensures that the trial state machine remains perfectly synchronized even under hardware package loss.
+
 ---
 
 ## 4. Current Progress Status & Upcoming Research Objectives
@@ -141,6 +176,10 @@ The major structural and operational goals planned for the previous phase have b
 - [x] **Tabular Feature Exporters**: Enhanced saving routines to output multi-metric summary tables directly into the centralized `out/` folder structure, fully verified through relative directory alignment.
 - [x] **Codebase Handoff & Training**: Initiated the work transfer and documentation strategy to prepare for codebase handoff to the next generation of researchers, with physical peer training sessions conducted for potential candidates.
 - [x] **Sunset and Deactivation Timeline**: Codified the firm operational finalization date of June 24, 2026, and mapped out the automatic deactivation schedule for background reporting systems.
+- [x] **Collaborative Codebase Handoff Review**: Conducted final walkthrough review and verified independent execution of the pipelines.
+- [x] **System and Data Alignment Auditing**: Performed comprehensive repository audit and aligned standardized paths.
+- [x] **Automation Sunset Preparations**: Established deactivation sequence for reporting mechanisms.
+- [x] **Advanced Signal Processing Integration**: Deployed robust saccadic spike cleansing, calibration filtering, PCHIP boundary stabilization, and chronological state reconstruction.
 
 ### 4.2. Upcoming Research Objectives (Week 5–6)
 1.  **Batch Processing of Duty-Cycle Datasets**: Utilize the finalized protocol to complete additional experimental recording runs across multiple participants. Process these new datasets in batch using the parameterized Colab and local statistical pipelines to verify individual responses under 25%, 50%, and 75% blue duty cycles.
