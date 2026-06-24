@@ -114,14 +114,14 @@ This will open the Jupyter interface in your default web browser.
 ### Key Notebooks & Scripts
 
 #### 1. Pupillometry Analysis (`src/python/led-flash/`)
-- **[parse_asc.py](file:///Users/jikaewsi/Documents/code_and_scripts/tokai-internship/src/python/led-flash/parse_asc.py)**: Python script to parse EyeLink `.asc` files, extract pupil size data, and reconstruct blue LED stimulus periods.
-- **[colab_parsing_and_interpolation.ipynb](file:///Users/jikaewsi/Documents/code_and_scripts/tokai-internship/src/python/led-flash/colab_parsing_and_interpolation.ipynb)**: An interactive pipeline for uploading raw EyeLink data, performing PCHIP blink interpolation, visualizing raw vs. cleaned data, and exporting clean CSV files.
-- **[statistical_evaluation.ipynb](file:///Users/jikaewsi/Documents/code_and_scripts/tokai-internship/src/python/led-flash/statistical_evaluation.ipynb)**: Implements statistical metrics (baseline pupil diameter, normalized constriction rate, early/late AUC, and 6s PIPR) and generates publication-ready plots.
+- **[parse_asc.py](../../src/python/led-flash/parse_asc.py)**: Python script to parse EyeLink `.asc` files, extract pupil size data, and reconstruct blue LED stimulus periods.
+- **[colab_parsing_and_interpolation.ipynb](../../src/python/led-flash/colab_parsing_and_interpolation.ipynb)**: An interactive pipeline for uploading raw EyeLink data, performing PCHIP blink interpolation, visualizing raw vs. cleaned data, and exporting clean CSV files.
+- **[statistical_evaluation.ipynb](../../src/python/led-flash/statistical_evaluation.ipynb)**: Implements statistical metrics (baseline pupil diameter, normalized constriction rate, early/late AUC, and 6s PIPR) and generates publication-ready plots.
 
 #### 2. EEG/EOG Saccade Detection (`src/python/phantom-array-experiment/`)
-- **[detect_saccades.py](file:///Users/jikaewsi/Documents/code_and_scripts/tokai-internship/src/python/phantom-array-experiment/detect_saccades.py)**: Python implementation of the EOG-based saccade detection pipeline (bandpass filtering, differentiation, peak finding, and morphological noise-rejection quality gates).
-- **[visualize_saccades.ipynb](file:///Users/jikaewsi/Documents/code_and_scripts/tokai-internship/src/python/phantom-array-experiment/visualize_saccades.ipynb)**: Visualizes detected saccades overlaid on raw EOG signals to inspect the detection quality.
-- **[ssvep.ipynb](file:///Users/jikaewsi/Documents/code_and_scripts/tokai-internship/src/python/phantom-array-experiment/ssvep.ipynb)**: Contains the main EEG signal processing, spectrum calculations, and SSVEP (Steady-State Visually Evoked Potential) analysis.
+- **[detect_saccades.py](../../src/python/phantom-array-experiment/detect_saccades.py)**: Python implementation of the EOG-based saccade detection pipeline (bandpass filtering, differentiation, peak finding, and morphological noise-rejection quality gates).
+- **[visualize_saccades.ipynb](../../src/python/phantom-array-experiment/visualize_saccades.ipynb)**: Visualizes detected saccades overlaid on raw EOG signals to inspect the detection quality.
+- **[ssvep.ipynb](../../src/python/phantom-array-experiment/ssvep.ipynb)**: Contains the main EEG signal processing, spectrum calculations, and SSVEP (Steady-State Visually Evoked Potential) analysis.
 
 ---
 
