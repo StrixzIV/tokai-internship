@@ -86,13 +86,6 @@ The repository features an automated installer script that compiles Python depen
 
 ---
 
-## 🎓 Academic Continuity & Handoff
-* **Operation Finalization**: Inter-session workflows and scheduled automation sunset on **June 24, 2026, at 17:00**.
-* **Transition**: Incoming lab members have been trained on the physical experimental setups, data acquisition pipelines, and analytical notebooks to ensure research continuity.
-
----
----
-
 # 日本語版 (Japanese Version)
 
 ## 📌 総括（エグゼクティブ・サマリー）
@@ -132,7 +125,3 @@ The repository features an automated installer script that compiles Python depen
 * **環境構築の詳細手順**: [ローカル環境セットアップガイド](docs/jp/ローカル環境セットアップガイド.md) または [Google Colabセットアップガイド](docs/jp/Google_Colab_セットアップガイド.md) をご参照ください。
 
 ---
-
-## 🎓 研究引き継ぎとプロジェクト終了スケジュール
-* **プロジェクト公式終了**: 共同研究の成果物・パイプライン引継ぎ作業は **2026年6月24日 17:00** をもって完了します。
-* **引継ぎ準備**: 後任の研究員が実験および解析環境を即座に再現・拡張できるよう、測定機器の調整および解析ノートブックのハンズオントレーニングを実施済みです。
