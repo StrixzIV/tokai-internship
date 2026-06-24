@@ -1,0 +1,22 @@
+# --- Core Data Science & Plotting (both experiments) ---
+numpy
+pandas
+matplotlib
+seaborn
+scipy
+
+# --- Pupillometry / Led-Flash Experiment ---
+japanize-matplotlib   # Japanese font support in matplotlib
+
+# --- EEG / EOG / Phantom-Array Experiment ---
+mne==1.12.1           # MNE-Python for physiological signal processing
+pymatreader           # Required by MNE to read EEGLAB .set/.fdt files
+mne-qt-browser        # Interactive 2D Qt-based browser for MNE
+pyqt6                 # Qt backend for mne-qt-browser
+pyvistaqt             # 3D plotting backend helper
+vtk                   # 3D rendering engine for pyvista/mne
+pyvista               # 3D plotting for MNE
+
+# --- Development & Notebooks ---
+jupyter               # Jupyter Notebook environment
+ipykernel             # IPython kernel for Jupyter
